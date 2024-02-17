@@ -1,48 +1,24 @@
-# Install Nginx web server with Puppet
-include stdlib
-
-$link = 'https://www.youtube.com/watch?v=QH2-TGUlwu4'
-$content = "\trewrite ^/redirect_me/$ ${link} permanent;"
-$custom_header = "add_header X-Served-By \$hostname;"
-
-exec { 'update packages':
-  command => '/usr/bin/apt-get update'
+# installs a Nginx server with custome HTTP header
+exec {'update':
+   provider => shell,
+   command  => 'sudo apt-get -y update',
+   before   => Exec['install Nginx'],
 }
 
-exec { 'restart nginx':
-  command => '/usr/sbin/service nginx restart',
-  require => Package['nginx']
+exec {'install Nginx':
+   provider => shell,
+   command  => 'sudo apt-get -y install nginx',
+   before   => Exec['add_header'],
 }
 
-package { 'nginx':
-  ensure  => 'installed',
-  require => Exec['update packages']
+exec { 'add_header':
+   provider    => shell,
+   environment => ["HOST=${hostname}"],
+   command     => 'sudo sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOST\";/" /etc/nginx/nginx.conf',
+   before      => Exec['restart Nginx'],
 }
 
-file { '/var/www/html/index.html':
-  ensure  => 'present',
-  content => 'Holberton School',
-  mode    => '0644',
-  owner   => 'root',
-  group   => 'root'
-}
-
-file_line { 'Set 301 redirection':
-  ensure   => 'present',
-  after    => 'server_name\ _;',
-  path     => '/etc/nginx/sites-available/default',
-  multiple => true,
-  line     => $content,
-  notify   => Exec['restart nginx'],
-  require  => File['/var/www/html/index.html']
-}
-
-file_line { 'Set X-Served-By header':
-  ensure   => 'present',
-  after    => 'http {',
-  path     => '/etc/nginx/nginx.conf',
-  multiple => true,
-  line     => $custom_header,
-  notify   => Exec['restart nginx'],
-  require  => File['/var/www/html/index.html']
+exec { 'restart Nginx':
+   provider => shell,
+   command  => 'sudo service nginx restart',
 }

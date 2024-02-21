@@ -1,11 +1,10 @@
+#!/usr/bin/python3
+"""Exports to-do list information for a given employee ID to JSON format."""
+import json
+import requests
+import sys
 
- <timothymayor24@gmail.com>
- rts to-do list information for a given employee ID to JSON format."""
- import json
- import requests
- import sys
-
- if __name__ == "__main__":
+if __name__ == "__main__":
     user_id = sys.argv[1]
     url = "https://jsonplaceholder.typicode.com/"
     user = requests.get(url + "users/{}".format(user_id)).json()
@@ -17,4 +16,4 @@
                 "task": t.get("title"),
                 "completed": t.get("completed"),
                 "username": username
-            } for t in todos]}, jsonfile)i
+            } for t in todos]}, jsonfile)

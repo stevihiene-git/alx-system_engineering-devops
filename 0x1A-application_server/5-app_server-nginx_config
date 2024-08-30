@@ -2,14 +2,18 @@
 
 server {
     # Listen on port 80.
-    listen      80 default_server;
-    listen      [::]:80 default_server ipv6only=on;
+    listen      80;
+    listen      [::]:80;
+
+
+	
+    root /home/ubuntu/AirBnB_clone_v2/;
 
     # Use server IP as domain name
-    server_name 104.196.168.90;
+    server_name 35.153.67.242;
 
     # Customize HTTP response header
-    add_header  X-Served-By 375-web-01;
+    add_header  X-Served-By 274833-web-01;
 
     # Serve /airbnb-onepage/ route on AirBnB_clone_v2
     location = /airbnb-onepage/ {
@@ -23,7 +27,7 @@ server {
 
     # Serve AirBnB_clone_v3 API
     location /api {
-        proxy_pass http://127.0.0.1:5002/api;
+        proxy_pass http://127.0.0.1:5002;
     }
 
     # Configure /2-hbnb route of AirBnB_clone_v4 as root location
